@@ -17,10 +17,12 @@ class PowerProfileIndicator extends SystemIndicator {
 
         this._indicator = this._addIndicator();
 
-        GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1, () => {
+        this._timeout = GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
             this._power_profile_toggle = Main.panel.statusArea.quickSettings._powerProfiles.quickSettingsItems[0];
-            this._power_profile_toggle._proxy.connectObject('g-properties-changed', this._set_icon.bind(this), this);
-            this._set_icon();
+            if (this._power_profile_toggle) {
+                this._power_profile_toggle._proxy.connectObject('g-properties-changed', this._set_icon.bind(this), this);
+                this._set_icon();
+            }
 
             return GLib.SOURCE_REMOVE;
         });
@@ -31,6 +33,11 @@ class PowerProfileIndicator extends SystemIndicator {
     }
 
     _destroy() {
+        if (this._timeout) {
+            GLib.source_remove(this._timeout);
+            this._timeout = null;
+        }
+
         this._power_profile_toggle._proxy.disconnectObject(this);
         this._power_profile_toggle = null;
 
