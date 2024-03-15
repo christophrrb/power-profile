@@ -30,6 +30,12 @@ class PowerProfileIndicator extends SystemIndicator {
 
     _set_icon() {
         this._indicator.icon_name = this._power_profile_toggle.icon_name;
+
+        if (this._active_style_class_name) {
+            this._indicator.remove_style_class_name(this._active_style_class_name);
+        }
+        this._active_style_class_name = this._power_profile_toggle._proxy.ActiveProfile;
+        this._indicator.add_style_class_name(this._active_style_class_name);
     }
 
     _destroy() {
